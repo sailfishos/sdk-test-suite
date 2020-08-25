@@ -164,7 +164,17 @@ class SailfishSDK(_Variables):
         build_engine_type = variables['${BUILD_ENGINE_TYPE}']
         args = ['--verbose', 'non-interactive=1', 'accept-licenses=1',
                 'buildEngineType=' + build_engine_type]
-        return self._run_process(command, *args, token='installer')
+        result = self._run_process(command, *args, token='installer')
+
+        if variables['${DO_SSU_REGISTER}']:
+            credentials_file = variables['${CREDENTIALS}']
+            args = ['engine', 'exec', 'bash', '-c',
+                    'creds=$(<"{}") && sdk-manage register-all --no-sdk --force \
+                            --user "${{creds%%:*}}" --password "${{creds#*:}}"' \
+                            .format(credentials_file)]
+            result = self.run_sfdk(*args)
+
+        return result
 
     def maybe_uninstall_sdk(self):
         variables = BuiltIn().get_variables()
