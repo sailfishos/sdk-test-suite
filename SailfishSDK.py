@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from datetime import datetime
 import os.path
 from pathlib import Path
@@ -227,10 +228,18 @@ class SailfishSDK(_Variables):
         return self._run_process(command, *args,
                 token='sdk-maintenance-tool')
 
-    def _run_process(self, command, *arguments, expected_rc=0, token='process', **configuration):
-        with _Attachment(token + '-output.txt') as output:
+    def _run_process(self, command, *arguments, expected_rc=0, token='process',
+            merged_output=True, **configuration):
+        with ExitStack() as stack:
+            if merged_output:
+                stdout = stack.enter_context(_Attachment(token + '-output.txt')).path
+                stderr = 'STDOUT'
+            else:
+                stdout = stack.enter_context(_Attachment(token + '-stdout.txt')).path
+                stderr = stack.enter_context(_Attachment(token + '-stderr.txt')).path
+
             result = Process().run_process(command, *arguments, **configuration,
-                    stdout=str(output.path), stderr='STDOUT')
+                    stdout=str(stdout), stderr=str(stderr))
             if result.rc != expected_rc:
                 raise AssertionError('Process exited with unexpected code {}'.format(result.rc))
             return result
