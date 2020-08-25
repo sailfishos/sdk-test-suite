@@ -1,5 +1,6 @@
 from contextlib import ExitStack
 from datetime import datetime
+import filecmp
 import os.path
 from pathlib import Path
 from robot.errors import ExecutionFailed
@@ -207,6 +208,14 @@ class SailfishSDK(_Variables):
             args += ["--recursive"]
         args += [path]
         return self.run_sfdk(*args)
+
+    def write_random_content(self, path, approx_size):
+        with open(path, 'w') as f:
+            f.write(os.urandom(int(approx_size / 2)).hex('\n', 1024))
+
+    def files_should_be_equal(self, path1, path2):
+        if not filecmp.cmp(path1, path2, shallow=False):
+            raise AssertionError('Files differ')
 
     def _run_sdk_maintenance_tool(self, *extra_args, mode='manage-packages'):
         variables = BuiltIn().get_variables()
