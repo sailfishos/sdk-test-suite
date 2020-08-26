@@ -142,7 +142,7 @@ class SailfishSDK(_Variables):
     ROBOT_LIBRARY_VERSION = 1.0
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
-    def maybe_install_sdk(self):
+    def maybe_install_sdk(self, engine_memory_size_mb=None):
         variables = BuiltIn().get_variables()
 
         sdk_install_dir = variables['${SDK_INSTALL_DIR}']
@@ -165,6 +165,10 @@ class SailfishSDK(_Variables):
         args = ['--verbose', 'non-interactive=1', 'accept-licenses=1',
                 'buildEngineType=' + build_engine_type]
         result = self._run_process(command, *args, token='installer')
+
+        if engine_memory_size_mb:
+            args = ['engine', 'set', 'vm.memorySize=' + engine_memory_size_mb]
+            result = self.run_sfdk(*args)
 
         if variables['${DO_SSU_REGISTER}']:
             credentials_file = variables['${CREDENTIALS}']
