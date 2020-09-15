@@ -1,0 +1,6 @@
+[submodule "40__real_world_cases/packages/osmscout-sailfish"]
+	path = 40__real_world_cases/packages/osmscout-sailfish
+	url = https://github.com/Karry/osmscout-sailfish.git
+[submodule "40__real_world_cases/packages/harbour-storeman"]
+	path = 40__real_world_cases/packages/harbour-storeman
+	url = https://github.com/mentaljam/harbour-storeman.git

@@ -23,6 +23,10 @@ USE_EXISTING_SDK_INSTALLATION = False
 INSTALLER = "../SailfishSDK-installer.run"
 SDK_INSTALL_DIR = "~/SailfishOS"
 
+# Single line in format "<username>:<password>"
+CREDENTIALS = "../sailfish-account.txt"
+DO_SSU_REGISTER = False
+
 # Either "vbox" or "docker"
 BUILD_ENGINE_TYPE = "vbox"
 

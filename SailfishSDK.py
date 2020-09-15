@@ -1,4 +1,6 @@
+from contextlib import ExitStack
 from datetime import datetime
+import filecmp
 import os.path
 from pathlib import Path
 from robot.errors import ExecutionFailed
@@ -140,7 +142,7 @@ class SailfishSDK(_Variables):
     ROBOT_LIBRARY_VERSION = 1.0
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
-    def maybe_install_sdk(self):
+    def maybe_install_sdk(self, engine_memory_size_mb=None):
         variables = BuiltIn().get_variables()
 
         sdk_install_dir = variables['${SDK_INSTALL_DIR}']
@@ -162,7 +164,21 @@ class SailfishSDK(_Variables):
         build_engine_type = variables['${BUILD_ENGINE_TYPE}']
         args = ['--verbose', 'non-interactive=1', 'accept-licenses=1',
                 'buildEngineType=' + build_engine_type]
-        return self._run_process(command, *args, token='installer')
+        result = self._run_process(command, *args, token='installer')
+
+        if engine_memory_size_mb:
+            args = ['engine', 'set', 'vm.memorySize=' + engine_memory_size_mb]
+            result = self.run_sfdk(*args)
+
+        if variables['${DO_SSU_REGISTER}']:
+            credentials_file = variables['${CREDENTIALS}']
+            args = ['engine', 'exec', 'bash', '-c',
+                    'creds=$(<"{}") && sdk-manage register-all --no-sdk --force \
+                            --user "${{creds%%:*}}" --password "${{creds#*:}}"' \
+                            .format(credentials_file)]
+            result = self.run_sfdk(*args)
+
+        return result
 
     def maybe_uninstall_sdk(self):
         variables = BuiltIn().get_variables()
@@ -207,6 +223,14 @@ class SailfishSDK(_Variables):
         args += [path]
         return self.run_sfdk(*args)
 
+    def write_random_content(self, path, approx_size):
+        with open(path, 'w') as f:
+            f.write(os.urandom(int(approx_size / 2)).hex('\n', 1024))
+
+    def files_should_be_equal(self, path1, path2):
+        if not filecmp.cmp(path1, path2, shallow=False):
+            raise AssertionError('Files differ')
+
     def _run_sdk_maintenance_tool(self, *extra_args, mode='manage-packages'):
         variables = BuiltIn().get_variables()
         command = variables['${SDK_MAINTENANCE_TOOL}']
@@ -227,10 +251,18 @@ class SailfishSDK(_Variables):
         return self._run_process(command, *args,
                 token='sdk-maintenance-tool')
 
-    def _run_process(self, command, *arguments, expected_rc=0, token='process', **configuration):
-        with _Attachment(token + '-output.txt') as output:
+    def _run_process(self, command, *arguments, expected_rc=0, token='process',
+            merged_output=True, **configuration):
+        with ExitStack() as stack:
+            if merged_output:
+                stdout = stack.enter_context(_Attachment(token + '-output.txt')).path
+                stderr = 'STDOUT'
+            else:
+                stdout = stack.enter_context(_Attachment(token + '-stdout.txt')).path
+                stderr = stack.enter_context(_Attachment(token + '-stderr.txt')).path
+
             result = Process().run_process(command, *arguments, **configuration,
-                    stdout=str(output.path), stderr='STDOUT')
+                    stdout=str(stdout), stderr=str(stderr))
             if result.rc != expected_rc:
                 raise AssertionError('Process exited with unexpected code {}'.format(result.rc))
             return result

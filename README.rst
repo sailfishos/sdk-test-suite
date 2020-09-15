@@ -34,6 +34,10 @@ TBD
 Running the test suite
 ======================
 
+After cloning the Git repository containing this test suite, ensure that all submodules are populated and up to date::
+
+  git submodule update --init --recursive
+
 Start by ensuring that the SDK metadata recorded in ``config.py`` match the SDK version under test and that ``INSTALLER`` points to the correct installer executable or its wrapper that hides any environment-specific aspects of its invocation, like adding local repositories:
 
 ::
