@@ -235,7 +235,8 @@ class SailfishSDK(_Variables):
         variables = BuiltIn().get_variables()
         command = variables['${SDK_MAINTENANCE_TOOL}']
 
-        args = ['--verbose', 'non-interactive=1', 'accept-licenses=1']
+        args = ['--verbose', 'non-interactive=1', '--platform', 'minimal',
+                'accept-licenses=1']
 
         if mode == 'uninstall':
             pass
