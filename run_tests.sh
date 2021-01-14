@@ -20,7 +20,7 @@ echo LATEST_SFOS=$LATEST_SFOS
 sed -i "s/^OS_VERSION = .*/OS_VERSION = {\"ea\": \"$LATEST_SFOS\",/g" sdk-test-suite/config.py
 sed -i "s/\"latest\": .*/\"latest\": \"$LATEST_SFOS\",/g" sdk-test-suite/config.py
 mkdir sdk-test-suite.out && cd sdk-test-suite.out
-xvfb-run --server-args="-screen 0 1024x768x24" robot ../sdk-test-suite
+xvfb-run --server-args="-screen 0 1024x768x24" robot --exclude interactive ../sdk-test-suite
 # clean up
 [[ -f ~/SailfishOS/SDKMaintenanceTool ]] && ~/SailfishOS/SDKMaintenanceTool --verbose non-interactive=1 --platform minimal
 rm -Rf ~/SailfishOS
