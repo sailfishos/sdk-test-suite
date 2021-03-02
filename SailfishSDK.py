@@ -7,7 +7,7 @@ from robot.errors import ExecutionFailed
 from robot.libraries.BuiltIn import BuiltIn, RobotNotRunningError
 from robot.libraries.OperatingSystem import OperatingSystem
 from robot.libraries.Process import Process
-from robot.utils import get_link_path
+from robot.utils import get_link_path, is_truthy
 from robot.utils.dotdict import DotDict
 from robot.variables import Variables
 import shutil
@@ -196,11 +196,10 @@ class SailfishSDK(_Variables):
         action_arg = action + '-packages=' + ','.join(packages)
         return self._run_sdk_maintenance_tool(action_arg, mode='manage-packages')
 
-    def run_sfdk(self, *args, expected_rc=0, **configuration):
+    def run_sfdk(self, *args, **configuration):
         variables = BuiltIn().get_variables()
         command = variables['${SFDK}']
-        return self._run_process(command, *args, expected_rc=expected_rc, token='sfdk',
-                **configuration)
+        return self._run_process(command, *args, token='sfdk', **configuration)
 
     def vboxsf_safe_remove_directory(self, path, recursive=False):
         """Same as BuiltIn.remove_directory but executes inside build engine to
@@ -252,8 +251,12 @@ class SailfishSDK(_Variables):
         return self._run_process(command, *args,
                 token='sdk-maintenance-tool')
 
-    def _run_process(self, command, *arguments, expected_rc=0, token='process',
-            merged_output=True, **configuration):
+    def _run_process(self, command, *arguments, **configuration):
+
+        expected_rc = int(configuration.pop('expected_rc', 0))
+        token = configuration.pop('token', 'process')
+        merged_output = is_truthy(configuration.pop('merged_output', True))
+
         with ExitStack() as stack:
             if merged_output:
                 stdout = stack.enter_context(_Attachment(token + '-output.txt')).path
