@@ -10,6 +10,7 @@ from robot.libraries.Process import Process
 from robot.utils import get_link_path, is_truthy
 from robot.utils.dotdict import DotDict
 from robot.variables import Variables
+import shlex
 import shutil
 import tempfile
 
@@ -259,10 +260,15 @@ class SailfishSDK(_Variables):
         input = configuration.pop('input', None)
         if input and not isinstance(input, bytes):
             input = input.encode()
+        tty = is_truthy(configuration.pop('tty', False))
+        redirection = configuration.pop('redirection', None)
 
         # For compatibility with Process.run_process()
         timeout = configuration.pop('timeout', None)
         on_timeout = configuration.pop('on_timeout', 'terminate')
+
+        if redirection and not tty:
+            raise ValueError('Cannot use "redirection" without "tty"')
 
         with ExitStack() as stack:
             if merged_output:
@@ -271,6 +277,17 @@ class SailfishSDK(_Variables):
             else:
                 stdout = stack.enter_context(_Attachment(token + '-stdout.txt')).path
                 stderr = stack.enter_context(_Attachment(token + '-stderr.txt')).path
+
+            if tty:
+                joined = shlex.join((command,) + arguments)
+                if redirection:
+                    joined += ' ' + redirection
+                command = 'script'
+                arguments = list()
+                arguments += ['--return']
+                arguments += ['--quiet']
+                arguments += ['--echo', 'never', '--log-out', '/dev/null']
+                arguments += ['--command', joined]
 
             process = Process()
             handle = process.start_process(command, *arguments, **configuration,
