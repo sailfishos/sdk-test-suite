@@ -3,10 +3,10 @@
 
 OS_VARIANT = "Sailfish OS"
 SDK_VARIANT = "Sailfish SDK"
-SDK_VERSION = "3.1.2"
-OS_VERSION = {"ea": "3.3.0.11",
-              "latest": "3.3.0.11",
-              "oldest": "3.0.0.8"}
+SDK_VERSION = "3.3.4"
+OS_VERSION = {"ea": "3.4.0.22",
+              "latest": "3.4.0.22",
+              "oldest": "3.0.3.9"}
 
 ###############################################################################
 # Execution Profile
@@ -22,6 +22,10 @@ USE_EXISTING_SDK_INSTALLATION = False
 # Relative paths are resolved relatively to robot execution directory
 INSTALLER = "../SailfishSDK-installer.run"
 SDK_INSTALL_DIR = "~/SailfishOS"
+
+# Single line in format "<username>:<password>"
+CREDENTIALS = "../sailfish-account.txt"
+DO_SSU_REGISTER = False
 
 # Either "vbox" or "docker"
 BUILD_ENGINE_TYPE = "vbox"
@@ -41,4 +45,4 @@ DEVICE_ARCH = "i486"
 DEVICE_OS_VERSION = "latest"
 
 # Device's regular user name
-DEVICE_USER = "nemo"
+DEVICE_USER = "defaultuser"
