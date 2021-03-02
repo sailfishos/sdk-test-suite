@@ -256,6 +256,13 @@ class SailfishSDK(_Variables):
         expected_rc = int(configuration.pop('expected_rc', 0))
         token = configuration.pop('token', 'process')
         merged_output = is_truthy(configuration.pop('merged_output', True))
+        input = configuration.pop('input', None)
+        if input and not isinstance(input, bytes):
+            input = input.encode()
+
+        # For compatibility with Process.run_process()
+        timeout = configuration.pop('timeout', None)
+        on_timeout = configuration.pop('on_timeout', 'terminate')
 
         with ExitStack() as stack:
             if merged_output:
@@ -265,8 +272,15 @@ class SailfishSDK(_Variables):
                 stdout = stack.enter_context(_Attachment(token + '-stdout.txt')).path
                 stderr = stack.enter_context(_Attachment(token + '-stderr.txt')).path
 
-            result = Process().run_process(command, *arguments, **configuration,
+            process = Process()
+            handle = process.start_process(command, *arguments, **configuration,
                     stdout=str(stdout), stderr=str(stderr))
+            if input:
+                process_object = process.get_process_object(handle)
+                process_object.stdin.write(input)
+                process_object.stdin.close()
+            result = process.wait_for_process(handle, timeout, on_timeout)
+
             if result.rc != expected_rc:
                 raise AssertionError('Process exited with unexpected code {}'.format(result.rc))
             return result
