@@ -38,7 +38,7 @@ After cloning the Git repository containing this test suite, ensure that all sub
 
   git submodule update --init --recursive
 
-Start by ensuring that the SDK metadata recorded in ``config.py`` match the SDK version under test and that ``INSTALLER`` points to the correct installer executable or its wrapper that hides any environment-specific aspects of its invocation, like adding local repositories:
+If needed, prepare a wrapper script that hides any environment-specific aspects of installer invocation, like adding local repositories:
 
 ::
 
@@ -49,13 +49,16 @@ Start by ensuring that the SDK metadata recorded in ``config.py`` match the SDK 
    export TMPDIR=$HOME/tmp
    exec "$installer" --addRepository "file://$repo/commmon/,file://$repo/linux-64/" "$@"
 
-By default the installer executable (or its wrapper) is expected to exist as ``SailfishSDK-installer.run`` in the parent directory of the robot execution directory.
-
-Run the test suite:
+Create a working directory for this test run, enter it and configure the test suite - point it to
+the installer executable/wrapper (run `configure` with  `--help` to learn about available options):
 
 ::
 
    mkdir sdk-test-suite.out && cd sdk-test-suite.out
+   ../path/to/sdk-test-suite/configure ../path/to/installer.run
+
+Run the test suite::
+
    robot ../path/to/sdk-test-suite
 
 Open test report::

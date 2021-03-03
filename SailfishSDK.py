@@ -14,6 +14,11 @@ import shlex
 import shutil
 import tempfile
 
+class ConfigurationError(RuntimeError):
+    ROBOT_SUPPRESS_NAME = True
+    # FIXME: This does not work
+    ROBOT_EXIT_ON_FAILURE = True
+
 class _Attachment:
     def __init__(self, base_name):
         name = Path(base_name)
@@ -121,8 +126,13 @@ class _Variables:
         explicitly as a variables file.
         """
 
-        config_dir = os.path.dirname(os.path.abspath(__file__))
-        config_file = os.path.join(config_dir, 'config.py')
+        config_file = os.path.abspath('config.py')
+        if not os.path.exists(config_file):
+            source_dir = os.path.dirname(os.path.abspath(__file__))
+            configure = os.path.join(source_dir, 'configure')
+            configure = os.path.relpath(configure)
+            raise ConfigurationError("Configuration file not found. Forgot to run '{}'?"
+                    .format(configure))
 
         config = Variables()
         config.set_from_file(config_file)
