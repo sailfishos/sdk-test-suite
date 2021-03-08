@@ -11,7 +11,7 @@ chmod +x $installer
 cat > SailfishSDK-installer.run << EOF
 #!/bin/bash
 export TMPDIR=$WORKSPACE_TMP
-exec "$installer" --platform minimal --addRepository "file://$repo/common/,file://$repo/linux-64" "\$@"
+exec "$installer" --addRepository "file://$repo/common/,file://$repo/linux-64" "\$@"
 EOF
 chmod +x SailfishSDK-installer.run
 mkdir sdk-test-suite.out && cd sdk-test-suite.out
