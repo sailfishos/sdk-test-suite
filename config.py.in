@@ -3,9 +3,9 @@
 
 OS_VARIANT = "Sailfish OS"
 SDK_VARIANT = "Sailfish SDK"
-SDK_VERSION = "3.3.4"
-OS_VERSION = {"ea": "3.4.0.22",
-              "latest": "3.4.0.22",
+SDK_VERSION = "{{SDK_VERSION}}"
+OS_VERSION = {"ea": "{{OS_VERSION_EA}}",
+              "latest": "{{OS_VERSION_LATEST}}",
               "oldest": "3.0.3.9"}
 
 ###############################################################################
@@ -17,10 +17,10 @@ OS_VERSION = {"ea": "3.4.0.22",
 # Set to True to use an existing SDK installation. The most common use case for
 # this feature is to shorten the execution times during test case
 # development/debugging to achieve shorter execution times.
-USE_EXISTING_SDK_INSTALLATION = False
+USE_EXISTING_SDK_INSTALLATION = {{USE_EXISTING_SDK_INSTALLATION}}
 
 # Relative paths are resolved relatively to robot execution directory
-INSTALLER = "../SailfishSDK-installer.run"
+INSTALLER = "{{INSTALLER}}"
 SDK_INSTALL_DIR = "~/SailfishOS"
 
 # Single line in format "<username>:<password>"
@@ -28,7 +28,7 @@ CREDENTIALS = "../sailfish-account.txt"
 DO_SSU_REGISTER = False
 
 # Either "vbox" or "docker"
-BUILD_ENGINE_TYPE = "vbox"
+BUILD_ENGINE_TYPE = "{{BUILD_ENGINE_TYPE}}"
 
 # Either "emulator" or "hardware".
 #
