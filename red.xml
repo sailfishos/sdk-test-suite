@@ -5,7 +5,9 @@
     <referencedLibrary type="PYTHON" name="SailfishSDK" path="sdk-test-suite/SailfishSDK.py" dynamic="false"/>
     <pythonpath/>
     <classpath/>
-    <excludedForValidation/>
+    <excludedForValidation>
+        <excludedPath path="40__real_world_cases/packages"/>
+    </excludedForValidation>
     <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>
     <validatedFileMaxSize>1024</validatedFileMaxSize>
 </projectConfiguration>

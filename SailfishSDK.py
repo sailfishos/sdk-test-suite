@@ -7,9 +7,10 @@ from robot.errors import ExecutionFailed
 from robot.libraries.BuiltIn import BuiltIn, RobotNotRunningError
 from robot.libraries.OperatingSystem import OperatingSystem
 from robot.libraries.Process import Process
-from robot.utils import get_link_path
+from robot.utils import get_link_path, is_truthy
 from robot.utils.dotdict import DotDict
 from robot.variables import Variables
+import shlex
 import shutil
 import tempfile
 
@@ -196,11 +197,10 @@ class SailfishSDK(_Variables):
         action_arg = action + '-packages=' + ','.join(packages)
         return self._run_sdk_maintenance_tool(action_arg, mode='manage-packages')
 
-    def run_sfdk(self, *args, expected_rc=0, **configuration):
+    def run_sfdk(self, *args, **configuration):
         variables = BuiltIn().get_variables()
         command = variables['${SFDK}']
-        return self._run_process(command, *args, expected_rc=expected_rc, token='sfdk',
-                **configuration)
+        return self._run_process(command, *args, token='sfdk', **configuration)
 
     def vboxsf_safe_remove_directory(self, path, recursive=False):
         """Same as BuiltIn.remove_directory but executes inside build engine to
@@ -252,8 +252,24 @@ class SailfishSDK(_Variables):
         return self._run_process(command, *args,
                 token='sdk-maintenance-tool')
 
-    def _run_process(self, command, *arguments, expected_rc=0, token='process',
-            merged_output=True, **configuration):
+    def _run_process(self, command, *arguments, **configuration):
+
+        expected_rc = int(configuration.pop('expected_rc', 0))
+        token = configuration.pop('token', 'process')
+        merged_output = is_truthy(configuration.pop('merged_output', True))
+        input = configuration.pop('input', None)
+        if input and not isinstance(input, bytes):
+            input = input.encode()
+        tty = is_truthy(configuration.pop('tty', False))
+        redirection = configuration.pop('redirection', None)
+
+        # For compatibility with Process.run_process()
+        timeout = configuration.pop('timeout', None)
+        on_timeout = configuration.pop('on_timeout', 'terminate')
+
+        if redirection and not tty:
+            raise ValueError('Cannot use "redirection" without "tty"')
+
         with ExitStack() as stack:
             if merged_output:
                 stdout = stack.enter_context(_Attachment(token + '-output.txt')).path
@@ -262,8 +278,26 @@ class SailfishSDK(_Variables):
                 stdout = stack.enter_context(_Attachment(token + '-stdout.txt')).path
                 stderr = stack.enter_context(_Attachment(token + '-stderr.txt')).path
 
-            result = Process().run_process(command, *arguments, **configuration,
+            if tty:
+                joined = shlex.join((command,) + arguments)
+                if redirection:
+                    joined += ' ' + redirection
+                command = 'script'
+                arguments = list()
+                arguments += ['--return']
+                arguments += ['--quiet']
+                arguments += ['--echo', 'never', '--log-out', '/dev/null']
+                arguments += ['--command', joined]
+
+            process = Process()
+            handle = process.start_process(command, *arguments, **configuration,
                     stdout=str(stdout), stderr=str(stderr))
+            if input:
+                process_object = process.get_process_object(handle)
+                process_object.stdin.write(input)
+                process_object.stdin.close()
+            result = process.wait_for_process(handle, timeout, on_timeout)
+
             if result.rc != expected_rc:
                 raise AssertionError('Process exited with unexpected code {}'.format(result.rc))
             return result
