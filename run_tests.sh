@@ -15,7 +15,7 @@ exec "$installer" --addRepository "file://$repo/common/,file://$repo/linux-64" "
 EOF
 chmod +x SailfishSDK-installer.run
 mkdir sdk-test-suite.out && cd sdk-test-suite.out
-../sdk-test-suite/configure ../SailfishSDK-installer.run
+xvfb-run --server-args="-screen 0 1024x768x24" ../sdk-test-suite/configure ../SailfishSDK-installer.run
 xvfb-run --server-args="-screen 0 1024x768x24" robot --exclude interactive ../sdk-test-suite
 # clean up
 [[ -f ~/SailfishOS/SDKMaintenanceTool ]] && ~/SailfishOS/SDKMaintenanceTool --verbose non-interactive=1 --platform minimal
