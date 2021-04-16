@@ -41,7 +41,7 @@ Method SDK, Filtered
     Package Should Not Be Installed On Device    foobar-debugsource
     # FIXME Configure device so that it does not ask
     Log To Console    \nPlease confirm installation on device!
-    Run Sfdk    deploy    --sdk    --    +*-debugsource    -*-foobar    cwd=foobar
+    Run Sfdk    deploy    --sdk    --debug    --    +*-debugsource    -*-foobar    cwd=foobar
     Package Should Not Be Installed On Device    foobar
     Package Should Not Be Installed On Device    foobar-debuginfo
     Package Should Be Installed On Device    foobar-debugsource
@@ -69,7 +69,7 @@ Method Manual, With Debug Info
 
 Method Manual, Filtered
     Directory Should Not Exist On Device    /home/${DEVICE.user}/RPMS
-    Run Sfdk    deploy    --manual    --    +*-debugsource    -*-foobar    cwd=foobar
+    Run Sfdk    deploy    --manual    --debug    --    +*-debugsource    -*-foobar    cwd=foobar
     Directory Should Exist On Device    /home/${DEVICE.user}/RPMS
     File Should Not Exist On Device    /home/${DEVICE.user}/RPMS/foobar-0-1.${DEVICE.arch}.rpm
     File Should Not Exist On Device    /home/${DEVICE.user}/RPMS/foobar-debuginfo-0-1.${DEVICE.arch}.rpm
