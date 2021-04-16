@@ -10,9 +10,10 @@ brief_usage()
 {
     cat <<END
 Usage: configure [--engine-type|-t <type>] [--keep|-k] [--non-interactive|-y]
-                 [--quiet] <installer>
+                 [--quiet] [--] <installer> [<args>...]
 
-Prepare the test suite for use with the specified SDK <installer>.
+Prepare the test suite for use with the specified SDK <installer>. Possible
+<args> will be used as initial arguments for the installer.
 END
 }
 
@@ -49,12 +50,18 @@ bool_to_python()
     [[ $1 ]] && echo True || echo False
 }
 
+strings_to_python()
+{
+    python -c 'import sys; print(repr(sys.argv[1:]))' "$@"
+}
+
 show_meta()
 {
     local installer=$1
+    local args=("${@:2}")
 
     local out=
-    out=$("$installer" --verbose non-interactive=1 show-meta=1)
+    out=$("$installer" ${args[@]:+"${args[@]}"} --verbose non-interactive=1 show-meta=1)
     # Installer should exit with 3 as it is actually canceled with show-meta=1
     if (( $? != 0 && $? != 3 )); then
         fatal "Failed to run installer in order to retrieve its metadata"
@@ -88,8 +95,11 @@ configure()
 {
     local orig_cmdline=("$@")
 
+    local installer_args=$(strings_to_python ${OPT_INSTALLER_ARGS[@]:+"${OPT_INSTALLER_ARGS[@]}"})
+
     local meta=
-    meta=$(show_meta "$OPT_INSTALLER" |tr , '\n') || return
+    meta=$(show_meta "$OPT_INSTALLER" ${OPT_INSTALLER_ARGS[@]:+"${OPT_INSTALLER_ARGS[@]}"} \
+        |tr , '\n') || return
 
     local sdk_version=
     sdk_version=$(get "$meta" sdk_release) || return
@@ -101,7 +111,10 @@ configure()
     local use_existing=$(bool_to_python "$OPT_KEEP")
 
     {
-        printf 'Installer: %s\n' "$OPT_INSTALLER"
+        printf 'Installer: %q\n' "$OPT_INSTALLER"
+        printf 'Installer arguments:'
+        printf ' %q' ${OPT_INSTALLER_ARGS[@]:+"${OPT_INSTALLER_ARGS[@]}"}
+        printf '\n'
         printf 'Use existing SDK installation: %s\n' "$use_existing"
         printf 'SDK version: %s\n' "$sdk_version"
         printf 'OS version (EA): %s\n' "$os_version_ea"
@@ -127,17 +140,24 @@ configure()
 
 END
 
-    sed -e "s,{{SDK_VERSION}},$sdk_version,g" \
-        -e "s,{{OS_VERSION_EA}},$os_version_ea,g" \
-        -e "s,{{OS_VERSION_LATEST}},$os_version_latest,g" \
-        -e "s,{{USE_EXISTING_SDK_INSTALLATION}},$use_existing,g" \
-        -e "s,{{INSTALLER}},$OPT_INSTALLER,g" \
-        -e "s,{{BUILD_ENGINE_TYPE}},$OPT_ENGINE_TYPE,g"
+    local config=
+    config=$(cat) || return
+
+    config=${config//'{{SDK_VERSION}}'/"$sdk_version"}
+    config=${config//'{{OS_VERSION_EA}}'/"$os_version_ea"}
+    config=${config//'{{OS_VERSION_LATEST}}'/"$os_version_latest"}
+    config=${config//'{{USE_EXISTING_SDK_INSTALLATION}}'/"$use_existing"}
+    config=${config//'{{INSTALLER}}'/"$OPT_INSTALLER"}
+    config=${config//'{{INSTALLER_ARGS}}'/"$installer_args"}
+    config=${config//'{{BUILD_ENGINE_TYPE}}'/"$OPT_ENGINE_TYPE"}
+
+    printf '%s' "$config"
 }
 
 parse_args()
 {
     OPT_INSTALLER=
+    OPT_INSTALLER_ARGS=()
     OPT_ENGINE_TYPE=vbox
     OPT_HELP=
     OPT_KEEP=
@@ -197,13 +217,9 @@ parse_args()
         return 1
     fi
 
-    if (( $# > 1 )); then
-        fatal "Unexpected argument: '$2'"
-        brief_usage >&2
-        return 1
-    fi
-
     OPT_INSTALLER=$1
+    shift
+    OPT_INSTALLER_ARGS=("$@")
 }
 
 main()

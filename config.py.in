@@ -21,6 +21,7 @@ USE_EXISTING_SDK_INSTALLATION = {{USE_EXISTING_SDK_INSTALLATION}}
 
 # Relative paths are resolved relatively to robot execution directory
 INSTALLER = "{{INSTALLER}}"
+INSTALLER_ARGS = {{INSTALLER_ARGS}}
 SDK_INSTALL_DIR = "~/SailfishOS"
 
 # Single line in format "<username>:<password>"

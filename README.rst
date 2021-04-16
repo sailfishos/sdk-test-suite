@@ -38,24 +38,15 @@ After cloning the Git repository containing this test suite, ensure that all sub
 
   git submodule update --init --recursive
 
-If needed, prepare a wrapper script that hides any environment-specific aspects of installer invocation, like adding local repositories:
-
-::
-
-   #!/bin/bash
-   installer=$HOME/installers/SailfishSDK-1.2.3-offline.run
-   repo=$installer.repo
-   # QTIFW-911
-   export TMPDIR=$HOME/tmp
-   exec "$installer" --addRepository "file://$repo/commmon/,file://$repo/linux-64/" "$@"
-
 Create a working directory for this test run, enter it and configure the test suite - point it to
-the installer executable/wrapper (run `configure` with  `--help` to learn about available options):
+the installer executable and optionally pass initial arguments for the installer (run `configure` with  `--help` to learn about available options):
 
 ::
 
+   repo=file:///path/to/local/repo
    mkdir sdk-test-suite.out && cd sdk-test-suite.out
-   ../path/to/sdk-test-suite/configure ../path/to/installer.run
+   ../path/to/sdk-test-suite/configure ../path/to/SailfishSDK-1.2.3-offline.run \
+       --addRepository "$repo/commmon/,$repo/linux-64/"
 
 Run the test suite::
 
