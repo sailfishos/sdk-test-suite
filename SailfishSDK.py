@@ -126,9 +126,15 @@ class _Variables:
         explicitly as a variables file.
         """
 
+        source_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Config file is meant to live in the output directory...
         config_file = os.path.abspath('config.py')
         if not os.path.exists(config_file):
-            source_dir = os.path.dirname(os.path.abspath(__file__))
+            # ...but look also into the sources to allow RED to do its job
+            config_file = os.path.join(source_dir, 'config.py')
+
+        if not os.path.exists(config_file):
             configure = os.path.join(source_dir, 'configure')
             configure = os.path.relpath(configure)
             raise ConfigurationError("Configuration file not found. Forgot to run '{}'?"

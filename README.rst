@@ -77,3 +77,11 @@ Eclipse with RED plugin
 - https://github.com/nokia/RED
 
 Install inside Eclipse via ``Help > Eclipse Marketplace...``, seach for RED.
+
+Unfortunately, when RED validates the test suite, it does it in a way that it
+requires that the configuration file exists under the source directory. This
+can be partially worked around with a symlink after configuration is done
+under a separate output directory::
+
+    cd sdk-test-suite
+    ln -s ../path/to/sdk-test-suite.out/config.py .
