@@ -14,6 +14,10 @@ import shlex
 import shutil
 import tempfile
 
+# TODO Python 3.8: Use shlex.join
+def shlex_join(args):
+    return ' '.join(shlex.quote(arg) for arg in args)
+
 class ConfigurationError(RuntimeError):
     ROBOT_SUPPRESS_NAME = True
     # FIXME: This does not work
@@ -296,7 +300,7 @@ class SailfishSDK(_Variables):
                 stderr = stack.enter_context(_Attachment(token + '-stderr.txt')).path
 
             if tty:
-                joined = shlex.join((command,) + arguments)
+                joined = shlex_join((command,) + arguments)
                 if redirection:
                     joined += ' ' + redirection
                 command = 'script'
