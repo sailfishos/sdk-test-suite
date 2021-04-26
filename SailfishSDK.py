@@ -14,6 +14,10 @@ import shlex
 import shutil
 import tempfile
 
+# TODO Python 3.8: Use shlex.join
+def shlex_join(args):
+    return ' '.join(shlex.quote(arg) for arg in args)
+
 class ConfigurationError(RuntimeError):
     ROBOT_SUPPRESS_NAME = True
     # FIXME: This does not work
@@ -126,9 +130,15 @@ class _Variables:
         explicitly as a variables file.
         """
 
+        source_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Config file is meant to live in the output directory...
         config_file = os.path.abspath('config.py')
         if not os.path.exists(config_file):
-            source_dir = os.path.dirname(os.path.abspath(__file__))
+            # ...but look also into the sources to allow RED to do its job
+            config_file = os.path.join(source_dir, 'config.py')
+
+        if not os.path.exists(config_file):
             configure = os.path.join(source_dir, 'configure')
             configure = os.path.relpath(configure)
             raise ConfigurationError("Configuration file not found. Forgot to run '{}'?"
@@ -172,8 +182,9 @@ class SailfishSDK(_Variables):
             raise
 
         command = variables['${INSTALLER}']
+        args = variables['${INSTALLER_ARGS}']
         build_engine_type = variables['${BUILD_ENGINE_TYPE}']
-        args = ['--verbose', 'non-interactive=1', 'accept-licenses=1',
+        args += ['--verbose', 'non-interactive=1', 'accept-licenses=1',
                 'buildEngineType=' + build_engine_type]
         result = self._run_process(command, *args, token='installer')
 
@@ -289,7 +300,7 @@ class SailfishSDK(_Variables):
                 stderr = stack.enter_context(_Attachment(token + '-stderr.txt')).path
 
             if tty:
-                joined = shlex.join((command,) + arguments)
+                joined = shlex_join((command,) + arguments)
                 if redirection:
                     joined += ' ' + redirection
                 command = 'script'
