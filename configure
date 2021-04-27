@@ -188,9 +188,9 @@ parse_args()
                 OPT_QUIET=1
                 ;;
             --)
+                shift
                 positionals+=("$@")
                 shift $#
-                break
                 ;;
             -??*)
                 arg=$1
@@ -203,7 +203,8 @@ parse_args()
                 return 1
                 ;;
             *)
-                positionals+=("$1")
+                positionals+=("$@")
+                shift $#
                 ;;
         esac
         shift
