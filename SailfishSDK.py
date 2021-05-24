@@ -182,10 +182,9 @@ class SailfishSDK(_Variables):
             raise
 
         command = variables['${INSTALLER}']
-        args = variables['@{INSTALLER_ARGS}']
         build_engine_type = variables['${BUILD_ENGINE_TYPE}']
-        args += ['--verbose', 'non-interactive=1', 'accept-licenses=1',
-                'buildEngineType=' + build_engine_type]
+        args = variables['@{INSTALLER_ARGS}'] + ['--verbose', 'non-interactive=1',
+                'accept-licenses=1', 'buildEngineType=' + build_engine_type]
         result = self._run_process(command, *args, token='installer')
 
         if engine_memory_size_mb:
