@@ -81,7 +81,7 @@ Suite Setup
     Run Sfdk    config    --global    target\=${DEVICE.build_target}
     Run Sfdk    config    --global    device\=${DEVICE.name}
     Create Directory    foobar
-    Run Sfdk    init    -t    qtquick    cwd=foobar
+    Run Sfdk    init    -t    qtquick2app    cwd=foobar
     Run Sfdk    build    --enable-debug    --    --noclean    cwd=foobar
 
 Suite Teardown
