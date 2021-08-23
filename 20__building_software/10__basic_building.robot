@@ -62,13 +62,13 @@ Suite Teardown
 
 In Tree Build Test Setup
     Create Directory    foobar
-    Run Sfdk    init    -t    qtquick    cwd=foobar
+    Run Sfdk    init    -t    qtquick2app    cwd=foobar
     Clear RPM Install Directory Inside Build Engine
 
 Shadow Build Test Setup
     Create Directory    foobar/foobar
     Create Directory    foobar/foobar-build
-    Run Sfdk    init    -t    qtquick    cwd=foobar/foobar
+    Run Sfdk    init    -t    qtquick2app    cwd=foobar/foobar
     Clear RPM Install Directory Inside Build Engine
 
 Test Teardown
