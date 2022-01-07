@@ -11,12 +11,12 @@ Basic Packaging
     Run Sfdk    check   -s    harbour    RPMS/harbour-foobar-0-1.${DEVICE.arch}.rpm    cwd=harbour-foobar
 
 Sailjail Good
-    Append To File    harbour-foobar/harbour-foobar.desktop    [X-Sailjail]\nOrganizationName=org.foobar\nApplicationName=Foobar\nPermissions=Audio;Videos;Compatibility\n
+    Append To Line In File    harbour-foobar/harbour-foobar.desktop    Permissions=    Audio;Videos;Compatibility
     Run Sfdk    build    cwd=harbour-foobar
     Run Sfdk    check    -s    harbour    RPMS/harbour-foobar-0-1.${DEVICE.arch}.rpm    cwd=harbour-foobar
 
 Sailjail Bad
-    Append To File    harbour-foobar/harbour-foobar.desktop    [X-Sailjail]\nOrganizationName=org.foobar\nApplicationName=Foobar\nPermissions=Audio;Videos;Phone;Compatibility\n
+    Append To Line In File    harbour-foobar/harbour-foobar.desktop    Permissions=    Audio;Videos;Phone;Compatibility
     Run Sfdk    build    cwd=harbour-foobar
     Run Sfdk    check    -s    harbour    RPMS/harbour-foobar-0-1.${DEVICE.arch}.rpm    cwd=harbour-foobar    expected_rc=1
 
