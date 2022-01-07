@@ -52,7 +52,7 @@ bool_to_python()
 
 strings_to_python()
 {
-    python -c 'import sys; print(repr(sys.argv[1:]))' "$@"
+    python3 -c 'import sys; print(repr(sys.argv[1:]))' "$@"
 }
 
 show_meta()
