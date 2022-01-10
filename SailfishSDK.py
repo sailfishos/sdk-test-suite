@@ -1,6 +1,7 @@
 from contextlib import ExitStack
 from datetime import datetime
 import filecmp
+import fileinput
 import os.path
 from pathlib import Path
 from robot.errors import ExecutionFailed
@@ -12,6 +13,7 @@ from robot.utils.dotdict import DotDict
 from robot.variables import Variables
 import shlex
 import shutil
+import sys
 import tempfile
 
 # TODO Python 3.8: Use shlex.join
@@ -250,6 +252,14 @@ class SailfishSDK(_Variables):
     def files_should_be_equal(self, path1, path2):
         if not filecmp.cmp(path1, path2, shallow=False):
             raise AssertionError('Files differ')
+
+    def append_to_line_in_file(self, file, pattern, addition):
+        """ Add text to lines matching a pattern
+        """
+        for line in fileinput.input(file, inplace=1):
+            if pattern in line:
+                line = line.rstrip() + addition + '\n'
+            sys.stdout.write(line)
 
     def _run_sdk_maintenance_tool(self, *extra_args, mode='manage-packages'):
         variables = BuiltIn().get_variables()
