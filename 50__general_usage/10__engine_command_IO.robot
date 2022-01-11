@@ -117,6 +117,7 @@ Run Built-In Engine Command With Redirection Under TTY And Check Pseudo-Terminal
 Suite Setup
     Clear Configuration
     Run Sfdk    config    --global    target\=${DEVICE.build_target}
+    Run Sfdk    build-init
 
 Suite Teardown
     Clear Configuration
