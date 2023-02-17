@@ -9,7 +9,7 @@ Resource          ../SailfishSDK.robot
 *** Test Cases ***
 Build Passes
     [Template]    Build Package
-    harbour-storeman     master
+    harbour-storeman     devel
     osmscout-sailfish    master
 
 *** Keywords ***
