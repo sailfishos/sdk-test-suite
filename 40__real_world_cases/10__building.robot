@@ -9,8 +9,8 @@ Resource          ../SailfishSDK.robot
 *** Test Cases ***
 Build Passes
     [Template]    Build Package
-    harbour-storeman     devel
-    osmscout-sailfish    master
+    harbour-storeman     90fcf9a
+    osmscout-sailfish    7b5d03a
 
 *** Keywords ***
 Suite Setup
@@ -21,7 +21,9 @@ Suite Teardown
     Clear Configuration
 
 Build Package
-    [Arguments]    ${name}    ${branch}
-    Run Process    git    clone    --branch    ${branch}    --recurse-submodules    ${CURDIR}/packages/${name}    ${name}
+    [Arguments]    ${name}    ${commit}
+    Run Process    git    clone    ${CURDIR}/packages/${name}    ${name}
+    Run Process    git    -C    ${name}    checkout    ${commit}
+    Run Process    git    -C    ${name}    submodule    update    --init    --recursive
     Run Sfdk    build    cwd=${name}
     [Teardown]    Remove Directory    ${name}    recursive=True
