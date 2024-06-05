@@ -10,7 +10,7 @@ Resource          ../SailfishSDK.robot
 Build Passes
     [Template]    Build Package
     harbour-storeman     90fcf9a
-    osmscout-sailfish    7b5d03a
+    osmscout-sailfish    b70dcee
 
 *** Keywords ***
 Suite Setup
