@@ -320,13 +320,14 @@ class SailfishSDK(_Variables):
                 arguments += ['--command', joined]
 
             process = Process()
-            handle = process.start_process(command, *arguments, **configuration,
-                    stdout=str(stdout), stderr=str(stderr))
+            process_object = process.start_process(command, *arguments, **configuration,
+                    stdout=str(stdout), stderr=str(stderr), stdin='PIPE')
+
             if input:
-                process_object = process.get_process_object(handle)
                 process_object.stdin.write(input)
                 process_object.stdin.close()
-            result = process.wait_for_process(handle, timeout, on_timeout)
+
+            result = process.wait_for_process(process_object, timeout, on_timeout)
 
             if result.rc != expected_rc:
                 raise AssertionError('Process exited with unexpected code {}'.format(result.rc))
