@@ -321,7 +321,7 @@ class SailfishSDK(_Variables):
 
             process = Process()
             handle = process.start_process(command, *arguments, **configuration,
-                    stdout=str(stdout), stderr=str(stderr))
+                    stdout=str(stdout), stderr=str(stderr), stdin='PIPE')
             if input:
                 process_object = process.get_process_object(handle)
                 process_object.stdin.write(input)
