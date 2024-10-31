@@ -196,7 +196,7 @@ class SailfishSDK(_Variables):
         if variables['${DO_SSU_REGISTER}']:
             credentials_file = variables['${CREDENTIALS}']
             args = ['engine', 'exec', 'bash', '-c',
-                    'creds=$(<"{}") && sdk-manage register-all --no-sdk --force \
+                    'creds=$(<"{}") && sdk-manage register-all --force \
                             --user "${{creds%%:*}}" --password "${{creds#*:}}"' \
                             .format(credentials_file)]
             result = self.run_sfdk(*args)
