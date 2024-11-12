@@ -217,7 +217,7 @@ parse_args()
                 positionals+=("$@")
                 shift $#
                 ;;
-            -??*)
+            -[^-]?*)
                 arg=$1
                 shift
                 set -- "${arg}" -"${arg:1:1}" -"${arg:2}" "${@}"
