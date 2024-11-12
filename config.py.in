@@ -25,8 +25,8 @@ INSTALLER_ARGS = {{INSTALLER_ARGS}}
 SDK_INSTALL_DIR = "~/SailfishOS"
 
 # Single line in format "<username>:<password>"
-CREDENTIALS = "../sailfish-account.txt"
-DO_SSU_REGISTER = False
+SSU_CREDENTIALS_FILE = "{{SSU_CREDENTIALS_FILE}}"
+DO_SSU_REGISTER = {{DO_SSU_REGISTER}}
 
 # Either "vbox" or "docker"
 BUILD_ENGINE_TYPE = "{{BUILD_ENGINE_TYPE}}"

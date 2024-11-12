@@ -10,6 +10,7 @@ brief_usage()
 {
     cat <<END
 Usage: configure [--engine-type|-t <type>] [--keep|-k] [--non-interactive|-y]
+                 [--ssu-register <credentials-file>]
                  [--quiet] [--] <installer> [<args>...]
 
 Prepare the test suite for use with the specified SDK <installer>. Possible
@@ -34,6 +35,11 @@ OPTIONS
 
     --non-interactive|-y
         Answer yes to all questions.
+
+    --ssu-register <credentials-file>
+        SSU-register all the SDK objects. Read the SSU credentials from the
+        <credentials-file>. The file should contain single line in the format
+        "<username>:<password>".
 
     --quiet
         Do not print summary
@@ -110,6 +116,8 @@ configure()
 
     local use_existing=$(bool_to_python "$OPT_KEEP")
 
+    local ssu_register=$(bool_to_python "${OPT_SSU_CREDENTIALS:+1}")
+
     {
         printf 'Installer: %q\n' "$OPT_INSTALLER"
         printf 'Installer arguments:'
@@ -120,6 +128,8 @@ configure()
         printf 'OS version (EA): %s\n' "$os_version_ea"
         printf 'OS version (latest): %s\n' "$os_version_latest"
         printf 'Build engine type: %s\n' "$OPT_ENGINE_TYPE"
+        printf 'SSU-register: %s\n' "$ssu_register"
+        printf 'SSU credentials file: %s\n' "${OPT_SSU_CREDENTIALS:-(none)}"
     } >&2
 
     cat <<END
@@ -150,6 +160,8 @@ END
     config=${config//'{{INSTALLER}}'/"$OPT_INSTALLER"}
     config=${config//'{{INSTALLER_ARGS}}'/"$installer_args"}
     config=${config//'{{BUILD_ENGINE_TYPE}}'/"$OPT_ENGINE_TYPE"}
+    config=${config//'{{SSU_CREDENTIALS_FILE}}'/"${OPT_SSU_CREDENTIALS:-../sailfish-account.txt}"}
+    config=${config//'{{DO_SSU_REGISTER}}'/"$ssu_register"}
 
     printf '%s' "$config"
 }
@@ -162,6 +174,7 @@ parse_args()
     OPT_HELP=
     OPT_KEEP=
     OPT_NON_INTERACTIVE=
+    OPT_SSU_CREDENTIALS=
     OPT_QUIET=
 
     while (( $# > 0 )); do
@@ -183,6 +196,18 @@ parse_args()
                 ;;
             --non-interactive|-y)
                 OPT_NON_INTERACTIVE=1
+                ;;
+            --ssu-register)
+                if ! [[ $2 ]]; then
+                    fatal "Argument expected: '$1'"
+                    return 1
+                fi
+                if ! [[ -f $2 ]]; then
+                    fatal "File not found: '$2'"
+                    return 1
+                fi
+                OPT_SSU_CREDENTIALS=$2
+                shift
                 ;;
             --quiet)
                 OPT_QUIET=1
