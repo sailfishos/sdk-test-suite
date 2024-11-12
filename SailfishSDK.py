@@ -196,11 +196,17 @@ class SailfishSDK(_Variables):
         if variables['${DO_SSU_REGISTER}']:
             credentials_file = variables['${CREDENTIALS}']
             args = ['engine', 'exec', 'bash', '-c',
-                    'creds=$(<"{}") && sdk-manage register-all --force \
-                            --user "${{creds%%:*}}" --password "${{creds#*:}}"' \
-                            .format(credentials_file)]
-            result = self.run_sfdk(*args)
+                    'IFS=: read -r ssu_user ssu_pass \
+                        && sdk-manage register-all --force \
+                            --user "${ssu_user}" --password "${ssu_pass}"']
+            result = self.run_sfdk(*args, tty=True, redirection='<'+credentials_file)
+            args = ['emulator', 'exec', 'bash', '-c',
+                    'IFS=: read -r ssu_user ssu_pass \
+                        && sudo /usr/libexec/sdk-setup/sdk-register \
+                            -u "${ssu_user}" -p "${ssu_pass}"']
+            result = self.run_sfdk(*args, tty=True, redirection='<'+credentials_file)
 
+        # We just need to return some valid result object
         return result
 
     def maybe_uninstall_sdk(self):
