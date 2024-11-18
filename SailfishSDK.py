@@ -165,7 +165,7 @@ class SailfishSDK(_Variables):
     ROBOT_LIBRARY_VERSION = 1.0
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
-    def maybe_install_sdk(self, engine_memory_size_mb=None):
+    def maybe_install_sdk(self, vbox_engine_memory_size_mb=None):
         variables = BuiltIn().get_variables()
 
         sdk_install_dir = variables['${SDK_INSTALL_DIR}']
@@ -186,21 +186,27 @@ class SailfishSDK(_Variables):
         command = variables['${INSTALLER}']
         build_engine_type = variables['${BUILD_ENGINE_TYPE}']
         args = variables['@{INSTALLER_ARGS}'] + ['--verbose', 'non-interactive=1',
-                'accept-licenses=1', 'buildEngineType=' + build_engine_type]
+                'accept-licenses=1', 'build-engine-type=' + build_engine_type]
         result = self._run_process(command, *args, token='installer')
 
-        if engine_memory_size_mb:
-            args = ['engine', 'set', 'vm.memorySize=' + engine_memory_size_mb]
+        if build_engine_type == 'vbox' and vbox_engine_memory_size_mb:
+            args = ['engine', 'set', 'vm.memorySize=' + vbox_engine_memory_size_mb]
             result = self.run_sfdk(*args)
 
         if variables['${DO_SSU_REGISTER}']:
-            credentials_file = variables['${CREDENTIALS}']
+            credentials_file = variables['${SSU_CREDENTIALS_FILE}']
             args = ['engine', 'exec', 'bash', '-c',
-                    'creds=$(<"{}") && sdk-manage register-all --no-sdk --force \
-                            --user "${{creds%%:*}}" --password "${{creds#*:}}"' \
-                            .format(credentials_file)]
-            result = self.run_sfdk(*args)
+                    'IFS=: read -r ssu_user ssu_pass \
+                        && sdk-manage register-all --force \
+                            --user "${ssu_user}" --password "${ssu_pass}"']
+            result = self.run_sfdk(*args, tty=True, redirection='<'+credentials_file)
+            args = ['emulator', 'exec', 'bash', '-c',
+                    'IFS=: read -r ssu_user ssu_pass \
+                        && sudo /usr/libexec/sdk-setup/sdk-register \
+                            -u "${ssu_user}" -p "${ssu_pass}"']
+            result = self.run_sfdk(*args, tty=True, redirection='<'+credentials_file)
 
+        # We just need to return some valid result object
         return result
 
     def maybe_uninstall_sdk(self):
