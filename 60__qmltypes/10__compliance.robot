@@ -14,6 +14,7 @@ QML Type Info Matches The Latest API
     Run Sfdk    qmltypes    --batch    --csv     ${CURDIR}/qmltypes.csv    ${PROJECTS_DIR}    cwd=qmltypes.tmp
     ${result} =     Run Sfdk    qmltypes    --batch    --csv     ${CURDIR}/qmltypes.csv    ${PROJECTS_DIR}
     ...                         --status    cwd=qmltypes.tmp
+    Should Not Match Regexp    ${result.stdout}    ^(TODO|PROG|FAIL)    flags=MULTILINE
     Should Not Contain    ${result.stdout}    diff --git
 
 *** Keywords ***
