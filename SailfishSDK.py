@@ -198,7 +198,8 @@ class SailfishSDK(_Variables):
             args = ['engine', 'exec', 'bash', '-c',
                     'IFS=: read -r ssu_user ssu_pass \
                         && sdk-manage register-all --force \
-                            --user "${ssu_user}" --password "${ssu_pass}"']
+                            --user "${ssu_user}" --password "${ssu_pass}" \
+                        && sdk-manage refresh-all']
             result = self.run_sfdk(*args, tty=True, redirection='<'+credentials_file)
             args = ['emulator', 'exec', 'bash', '-c',
                     'IFS=: read -r ssu_user ssu_pass \
