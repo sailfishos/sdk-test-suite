@@ -39,11 +39,11 @@ nemo-transferengine-qt5,github.com:sailfishos/transfer-engine,-,libnemotransfere
 pyotherside-qml-plugin-python3-qt5,github.com:sailfishos/pyotherside,packaging/-,-
 qr-filter-qml-plugin,github.com:sailfishos/qr-filter-qml-plugin,-,-
 sailfish-access-control-qt5,github.com:sailfishos/sailfish-access-control,-,sailfish-access-control-qml-plugin
-sailfish-components-accounts-qt5,bitbucket.org:jolla/ui-sailfish-components-accounts,-,-
+sailfish-components-accounts-qt5,github.com:sailfishos/sailfish-components-accounts,-,-
 sailfish-components-bluetooth-qt5,bitbucket.org:jolla/ui-sailfish-components-bluetooth,-,-
 sailfish-components-contacts-qt5,bitbucket.org:jolla/ui-sailfish-components-contacts,-,-
 sailfish-components-filemanager,bitbucket.org:jolla/ui-sailfish-components-filemanager,-,-
-sailfish-components-gallery-qt5,bitbucket.org:jolla/ui-sailfish-components-gallery,-,-
+sailfish-components-gallery-qt5,github.com:sailfishos/sailfish-components-gallery,-,-
 sailfish-components-media-qt5,bitbucket.org:jolla/ui-sailfish-components-media,-,-
 sailfish-components-pickers-qt5,bitbucket.org:jolla/ui-sailfish-components-pickers,-,-
 sailfish-components-telephony-qt5,bitbucket.org:jolla/ui-sailfish-components-telephony,-,-
